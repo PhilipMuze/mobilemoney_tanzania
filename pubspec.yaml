@@ -1,0 +1,19 @@
+name: mobilemoney_tanzania
+description: "A Flutter package for all mobile money integration in Tanzania."
+version: 0.0.1
+homepage: "http://example.com"
+
+environment:
+  sdk: ^3.5.3
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.4.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
