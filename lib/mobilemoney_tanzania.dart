@@ -1,5 +1,7 @@
 library mobilemoney_tanzania;
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -8,19 +10,19 @@ class MobilemoneyTanzania {
   final bool isProduction;
   final String apiKey;
   String? _sessionKey;
-  String? amount;
+
   //User Required Parameters
   MobilemoneyTanzania({required this.isProduction, required this.apiKey});
 
   //Vodacom Payment collection
   Future<dynamic> vodacomPaymentCollect(
-      String amount,
-      int phonenumber,
-      String orgShortCode,
-      String tranRef,
-      String customertranRef,
-      String description) async {
-        
+    String amount,
+    int phonenumber,
+    String orgShortCode,
+    String tranRef,
+    String customertranRef,
+    String description,
+  ) async {
     //Get Session Key
     _sessionKey ??= await getVodacomSession();
 
@@ -73,8 +75,86 @@ class MobilemoneyTanzania {
     return _sessionKey!;
   }
 
+  Future<String?> getAirtelSession(String clientId, String clientSecret) async {
+    String baseurl = isProduction
+        ? "https://openapiuat.airtel.africa/auth/oauth2/token"
+        : "https://openapi.airtel.africa/auth/oauth2/token";
+
+    Uri url = Uri.https(baseurl);
+
+    final response = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "*/*",
+        },
+        body: jsonEncode({
+          "client_id": clientId,
+          "client_secret": clientSecret,
+          "grant_type": "client_credentials"
+        }));
+    if (response.statusCode == 200) {
+      final body = response.body;
+      // Decode the response body
+      final Map<String, dynamic> data = jsonDecode(body);
+      _sessionKey = data['data']['access_token'];
+    } else {
+      debugPrint('${response.statusCode} 	Session Creation Failed');
+    }
+
+    return _sessionKey;
+  }
+
   //Airtel payment collection
-  Future<dynamic> airtelPaymentCollect() async {}
+  Future<dynamic> airtelPaymentCollect(
+    String clientIdAirtel,
+    String clientSecretAirtel,
+    String referenceAirtel,
+    String phonenumberAirtel,
+    String amountAirtel,
+    String transactionIdAirtel,
+  ) async {
+    //Base url
+    String baseurl = isProduction
+        ? "https://openapi.airtel.africa/merchant/v2/payments/"
+        : " https://openapiuat.airtel.africa/merchant/v2/payments/";
+
+    //Get Session Key
+    _sessionKey ??= await getAirtelSession(clientIdAirtel, clientSecretAirtel);
+
+    //Create the Uri
+    Uri url = Uri.parse(baseurl);
+
+    //Create the request
+    final response = await http.post(url, headers: {
+      'Accept': '*/*',
+      "Content-Type": "application/json",
+      'X-Country': 'TZ',
+      'X-Currency': 'TZS',
+      "Authorization": "Bearer $_sessionKey",
+      'x-signature': "Encrypted payload",
+      "x-key": "Encrypted AES key and iv."
+    }, body: {
+      "reference": referenceAirtel,
+      "subscriber": {
+        "country": "TZ",
+        "currency": "TZS",
+        "msisdn": phonenumberAirtel
+      },
+      "transaction": {
+        "amount": amountAirtel,
+        "country": "TZ",
+        "currency": "TZS",
+        "id": transactionIdAirtel
+      }
+    });
+
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      debugPrint('${response.statusCode} 	Payment Collection Failed');
+      return null;
+    }
+  }
 
   //Tigo payment collection
   Future<dynamic> mixxPaymentCollect() async {}

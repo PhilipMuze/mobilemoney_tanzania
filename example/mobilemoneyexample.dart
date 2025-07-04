@@ -6,25 +6,25 @@ void main() {
     apiKey: "", // Get Public Apikey from Vodacom Developer dashboard.
   );
 
-  String? amount;
-  int? phonenumber;
-  String? orgShortCode;
-  String? tranRef;
-  String? customertranRef;
-  String? description;
-
 //Vodacom Mobile money collection
   mobileMoney.vodacomPaymentCollect(
-    amount = amount!, //Input|| Pass value
-    phonenumber = phonenumber!, //Input|| Pass value
-    orgShortCode = orgShortCode!, //Input|| Pass value
-    tranRef = tranRef!, //Input|| Pass value
-    customertranRef = customertranRef!, //Input|| Pass value
-    description = description!, //Input|| Pass value
+    "amount", //Input Amount
+    2557452320043, //Input Integer Phone Number
+    "Input Organization Short Code", //Input Organization Short Code
+    "Input transaction Reference", //Input transaction Reference
+    "customertranRef!", //Input Customer Transaction Reference
+    "description,", //Input Description
   );
 
-  mobileMoney.airtelPaymentCollect();
-
+// Example call to Airtel payment collect
+  mobileMoney.airtelPaymentCollect(
+    "clientIdAirtel", // Input your Airtel client ID
+    "clientSecretAirtel", // Input your Airtel client secret
+    "referenceAirtel", // Input reference
+    "phonenumberAirtel", // Input phone number
+    "amountAirtel", // Input amount
+    "transactionIdAirtel", // Input transaction ID
+  );
   mobileMoney.mixxPaymentCollect();
 
   mobileMoney.ttclPaymentCollect();
