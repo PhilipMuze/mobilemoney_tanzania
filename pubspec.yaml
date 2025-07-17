@@ -1,7 +1,7 @@
-name: mobilemoney_tanzania
-description: "A Flutter package for all mobile money integration in Tanzania."
+name: mobilemoneytanzania
+description: "A Simple Flutter package that integrates all mobile money providers in Tanzania. Included providers are Airtel,Vodacom,Halotel,Mixx and TTCL"
 version: 0.0.1
-homepage: "http://example.com"
+homepage: "https://github.com/PhilipMuze/mobilemoney_tanzania"
 
 environment:
   sdk: ^3.5.3

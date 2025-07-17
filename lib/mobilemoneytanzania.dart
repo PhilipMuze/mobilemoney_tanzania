@@ -1,4 +1,4 @@
-library mobilemoney_tanzania;
+library mobilemoneytanzania;
 
 import 'dart:convert';
 
@@ -156,12 +156,15 @@ class MobilemoneyTanzania {
     }
   }
 
+//TODO implement Tigo Payment collection
   //Tigo payment collection
   Future<dynamic> mixxPaymentCollect() async {}
 
+//TODO implement TTCL Payment collection
 //TTCL payment collection
   Future<dynamic> ttclPaymentCollect() async {}
 
+//TODO implement Halotel Payment collection
 //Halotel payment collection
   Future<dynamic> halotelPaymentCollect() async {}
 }

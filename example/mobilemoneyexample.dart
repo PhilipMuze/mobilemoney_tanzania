@@ -1,4 +1,4 @@
-import 'package:mobilemoney_tanzania/mobilemoney_tanzania.dart';
+import 'package:mobilemoneytanzania/mobilemoneytanzania.dart';
 
 void main() {
   final mobileMoney = MobilemoneyTanzania(

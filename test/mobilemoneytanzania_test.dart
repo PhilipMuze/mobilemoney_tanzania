@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobilemoney_tanzania/mobilemoney_tanzania.dart';
+import 'package:mobilemoneytanzania/mobilemoneytanzania.dart';
 
 void main() {
   group('MobilemoneyTanzania Tests', () {
