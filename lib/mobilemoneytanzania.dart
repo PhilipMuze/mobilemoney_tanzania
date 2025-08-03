@@ -10,7 +10,7 @@ class MobilemoneyTanzania {
   final bool isProduction;
   final String apiKey;
   String? _sessionKey;
-
+  String? accessToken;
   //User Required Parameters
   MobilemoneyTanzania({required this.isProduction, required this.apiKey});
 
@@ -167,4 +167,82 @@ class MobilemoneyTanzania {
 //TODO implement Halotel Payment collection
 //Halotel payment collection
   Future<dynamic> halotelPaymentCollect() async {}
+
+  // Generate OAuth access token using client credentials.
+  Future<String> generateAzamPayToken(
+      String appName, String clientId, String clientSecret) async {
+    //Change Based on the Environment Set by the user.
+    final String authBaseUrl = isProduction
+        ? 'https://authenticator.azampay.co.tz'
+        : 'https://authenticator-sandbox.azampay.co.tz';
+
+    final url = Uri.parse('$authBaseUrl/AppRegistration/GenerateToken');
+    final response = await http
+        .post(
+          url,
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            "appName": appName,
+            "clientId": clientId,
+            "clientSecret": clientSecret,
+          }),
+        )
+        .timeout(const Duration(seconds: 30));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return accessToken = data['data']['accessToken'];
+    } else {
+      throw Exception('Failed to generate token: ${response.body}');
+    }
+  }
+
+  Future<dynamic> azamPaymentCollect(
+    String accountNumber,
+    String amount,
+    String externalId,
+    String provider,
+    String appName,
+    String clientId,
+    String clientSecret,
+  ) async {
+    if (accessToken == null) {
+      await generateAzamPayToken(appName, clientId, clientSecret);
+    }
+    String callbackUrl = isProduction
+        ? "https://azampay.co.tz/api/v1/Checkout/Callback"
+        : "https://sandbox.azampay.co.tz/api/v1/Checkout/Callback";
+
+    final String checkoutBaseUrl = isProduction
+        ? 'https://azampay.co.tz'
+        : 'https://sandbox.azampay.co.tz';
+
+    final url = Uri.parse('$checkoutBaseUrl/azampay/mno/checkout');
+    final response = await http
+        .post(
+          url,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+            'X-API-Key': apiKey,
+          },
+          body: jsonEncode({
+            "accountNumber": accountNumber,
+            "amount": amount,
+            "currency": 'TZS',
+            "externalId": externalId,
+            "provider": provider,
+            "callbackUrl": callbackUrl,
+            "additionalProperties": {},
+          }),
+        )
+        .timeout(const Duration(seconds: 30));
+
+    final responseBody = jsonDecode(response.body);
+    if (response.statusCode == 200) {
+      return responseBody;
+    } else {
+      throw Exception('Failed to collect payment: ${response.body}');
+    }
+  }
 }
